@@ -3,12 +3,20 @@ import { useHistory } from "react-router-dom"
 import { getCurrentTabUrl } from "../chrome/utils"
 import "../assets/styles/tailwind.css"
 import logo from "../assets/img/tcu.jpeg"
+import axios from "axios"
 
 export const Home = () => {
   const [url, setUrl] = useState<string>("")
-  const [responseFromContent, setResponseFromContent] = useState<string>("")
+  const [warning, setWarning] = useState<string>("")
 
   let { push } = useHistory()
+
+  const fetchAPI = async (link: any) => {
+    const { data } = await axios.post("http://localhost:8000/url_check", {
+      url: link,
+    })
+    setWarning(data.msg)
+  }
 
   /**
    * Get current URL
@@ -16,6 +24,7 @@ export const Home = () => {
   useEffect(() => {
     getCurrentTabUrl((url) => {
       setUrl(url || "undefined")
+      fetchAPI(url)
     })
   }, [])
 
@@ -39,6 +48,7 @@ export const Home = () => {
         </div>
       </div>
       <p>{url.split("/")[2]}</p>
+      <p>{warning}</p>
     </div>
   )
 }
